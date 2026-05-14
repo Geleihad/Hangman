@@ -4,20 +4,20 @@ import java.util.*;
 
 public class Main {
 
-    static int numOfWrongLetters;
-    static final int MAX_MISTAKES = 6;
-    static StringBuilder state;
-    static String wordToGuess;
-    static String userInput;
-    static Set<Character> usedLetters = new HashSet<>();
+    private static int numOfWrongLetters;
+    private static final int MAX_MISTAKES = 6;
+    private static StringBuilder state;
+    private static String wordToGuess;
+    private static String userInput;
+    private static final Set<Character> usedLetters = new HashSet<>();
 
-    static Scanner sc = new Scanner(System.in);
+    private static final Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
         startGame();
     }
 
-    static void startGame() {
+    private static void startGame() {
         askUser();
         while (!userInput.equalsIgnoreCase("N")) {
             System.out.println("Игра началась");
@@ -29,14 +29,14 @@ public class Main {
 
     }
 
-    static void askUser() {
+    private static void askUser() {
         System.out.println(
                 "Введите любой символ, кроме N или n, чтобы начать игру. " + "\n" +
                         "Введите N или n, чтобы завершить работу.");
         userInput = sc.next();
     }
 
-    static void getWord() {
+    private static void getWord() {
         List<String> words = new BufferedReader(
                 new InputStreamReader(
                         Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream("dict"))
@@ -46,7 +46,7 @@ public class Main {
         wordToGuess = words.get(new Random().nextInt(words.size())).toLowerCase();
     }
 
-    static void playRound() {
+    private static void playRound() {
         numOfWrongLetters = 0;
         usedLetters.clear();
         state = new StringBuilder("*".repeat(wordToGuess.length()));
@@ -59,7 +59,7 @@ public class Main {
     }
 
 
-    static void makeMove() {
+    private static void makeMove() {
 
         String input = sc.next();
 
@@ -80,11 +80,11 @@ public class Main {
     }
 
 
-    static boolean isInputOk(String input) {
+    private static boolean isInputOk(String input) {
         return input.length() == 1 && input.matches("^[А-Яа-яЁё]$");
     }
 
-    static void checkLetter(char letter) {
+    private static void checkLetter(char letter) {
         if (wordToGuess.indexOf(letter) == -1) {
             numOfWrongLetters++;
         } else {
@@ -93,7 +93,7 @@ public class Main {
     }
 
 
-    static void showLetter(char letter) {
+    private static void showLetter(char letter) {
         for (int i = 0; i < wordToGuess.length(); i++) {
             if (wordToGuess.charAt(i) == letter) {
                 state.setCharAt(i, letter);
@@ -102,7 +102,7 @@ public class Main {
     }
 
 
-    static void printState() {
+    private static void printState() {
         System.out.println(state + " Кол-во ошибок: " + numOfWrongLetters + "/" + MAX_MISTAKES);
         switch (numOfWrongLetters) {
             case 0 -> System.out.println(
@@ -170,7 +170,7 @@ public class Main {
     }
 
 
-    static void endGame() {
+    private static void endGame() {
         if (numOfWrongLetters < MAX_MISTAKES)
             System.out.println("Победа! Загаданное слово было: " + wordToGuess + "\n");
         else System.out.println("Поражение! Загаданное слово было: " + wordToGuess + "\n");

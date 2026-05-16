@@ -13,6 +13,72 @@ public class Main {
     private static final String QUIT = "N";
     private static final String MASK_SYMBOL = "*";
 
+    private static final String[] HANGMAN_STAGES = {
+            """
+        +---+
+         |   |
+             |
+             |
+             |
+             |
+        =========
+        """,
+            """
+        +---+
+        |   |
+        O   |
+            |
+            |
+            |
+       =========
+       """,
+            """
+        +---+
+        |   |
+        O   |
+        |   |
+            |
+            |
+       =========
+       """,
+            """
+        +---+
+        |   |
+        O   |
+       /|   |
+            |
+            |
+       =========
+       """,
+            """
+        +---+
+        |   |
+        O   |
+       /|\\  |
+            |
+            |
+       =========
+       """,
+            """
+        +---+
+        |   |
+        O   |
+       /|\\  |
+       /    |
+            |
+       =========
+       """,
+            """
+        +---+
+        |   |
+        O   |
+       /|\\  |
+       / \\  |
+            |
+       =========
+       """
+    };
+
     private static final Set<Character> usedLetters = new TreeSet<>();
     private static final Scanner scanner = new Scanner(System.in);
 
@@ -125,114 +191,13 @@ public class Main {
         System.out.println(mask);
         System.out.printf("Кол-во ошибок: %d/%d%n", wrongLettersCount, MAX_MISTAKES);
         showUsedLetters();
-        System.out.println(HangmanPictures.values()[wrongLettersCount]);
+        System.out.println(HANGMAN_STAGES[wrongLettersCount]);
     }
 
 
     private static void endGame() {
         String resultMessage = wrongLettersCount < MAX_MISTAKES ? "Победа!" : "Поражение!";
         System.out.printf("%s Загаданное слово было: %s%n%n", resultMessage, wordToGuess);
-    }
-
-    private enum HangmanPictures {
-        NO_MAN {
-            @Override
-            public String toString() {
-                return """
-                        +---+
-                         |   |
-                             |
-                             |
-                             |
-                             |
-                        =========
-                        """;
-            }
-        },
-        HEAD {
-            @Override
-            public String toString() {
-                return """
-                         +---+
-                         |   |
-                         O   |
-                             |
-                             |
-                             |
-                        =========
-                        """;
-            }
-        },
-        BODY {
-            @Override
-            public String toString() {
-                return """
-                         +---+
-                         |   |
-                         O   |
-                         |   |
-                             |
-                             |
-                        =========
-                        """;
-            }
-        },
-        ONE_ARM {
-            @Override
-            public String toString() {
-                return """
-                         +---+
-                         |   |
-                         O   |
-                        /|   |
-                             |
-                             |
-                        =========
-                        """;
-            }
-        },
-        TWO_ARMS {
-            @Override
-            public String toString() {
-                return """
-                         +---+
-                         |   |
-                         O   |
-                        /|\\  |
-                             |
-                             |
-                        =========
-                        """;
-            }
-        },
-        ONE_LEG {
-            @Override
-            public String toString() {
-                return """
-                         +---+
-                         |   |
-                         O   |
-                        /|\\  |
-                        /    |
-                             |
-                        =========
-                        """;
-            }
-        },
-        TWO_LEGS {
-            @Override
-            public String toString() {
-                return """
-                         +---+
-                         |   |
-                         O   |
-                        /|\\  |
-                        / \\  |
-                             |
-                        =========
-                        """;
-            }
-        }
     }
 }
 

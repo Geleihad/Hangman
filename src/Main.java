@@ -41,7 +41,7 @@ public class Main {
         String userInput = scanner.next();
 
         while (!userInput.equalsIgnoreCase(START) && !userInput.equalsIgnoreCase(QUIT)) {
-            System.out.printf("Некорректный ввод. Введите '%s' или '%s'", START, QUIT);
+            System.out.printf("Некорректный ввод. Введите '%s' или '%s'%n", START, QUIT);
             userInput = scanner.next();
         }
 

@@ -123,7 +123,7 @@ public class Main {
 
     private static void showState() {
         System.out.println(mask);
-        System.out.println("Кол-во ошибок: " + wrongLettersCount + "/" + MAX_MISTAKES);
+        System.out.printf("Кол-во ошибок: %d/%d%n", wrongLettersCount, MAX_MISTAKES);
         showUsedLetters();
         System.out.println(HangmanPictures.values()[wrongLettersCount]);
     }
@@ -131,7 +131,7 @@ public class Main {
 
     private static void endGame() {
         String resultMessage = wrongLettersCount < MAX_MISTAKES ? "Победа!" : "Поражение!";
-        System.out.println(resultMessage + " Загаданное слово было: " + wordToGuess + "\n");
+        System.out.printf("%s Загаданное слово было: %s%n%n", resultMessage, wordToGuess);
     }
 
     private enum HangmanPictures {

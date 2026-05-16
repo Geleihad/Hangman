@@ -1,42 +1,54 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main {
 
-    private static int numOfWrongLetters;
     private static final int MAX_MISTAKES = 6;
-    private static StringBuilder state;
-    private static String wordToGuess;
-    private static String userInput;
-    private static final Set<Character> usedLetters = new HashSet<>();
+    private static final String REGEX = "^[А-Яа-яЁё]$";
+    private static final Pattern PATTERN = Pattern.compile(REGEX);
+    private static final String START = "Y";
+    private static final String QUIT = "N";
+    private static final String MASK_SYMBOL = "*";
 
-    private static final Scanner sc = new Scanner(System.in);
+    private static final Set<Character> usedLetters = new TreeSet<>();
+    private static final Scanner scanner = new Scanner(System.in);
+
+    private static int wrongLettersCount;
+    private static StringBuilder mask;
+    private static String wordToGuess;
 
     public static void main(String[] args) {
         startGame();
     }
 
     private static void startGame() {
-        askUser();
-        while (!userInput.equalsIgnoreCase("N")) {
+        while (wantsToPlay()) {
             System.out.println("Игра началась");
-            getWord();
+            initWord();
             playRound();
-            askUser();
         }
         System.out.println("Вы вышли из игры");
-
+        scanner.close();
     }
 
-    private static void askUser() {
-        System.out.println(
-                "Введите любой символ, кроме N или n, чтобы начать игру. " + "\n" +
-                        "Введите N или n, чтобы завершить работу.");
-        userInput = sc.next();
+    private static boolean wantsToPlay() {
+        System.out.printf("Введите '%s', чтобы начать игру%n", START);
+        System.out.printf("Введите '%s', чтобы завершить работу%n", QUIT);
+
+        String userInput = scanner.next();
+
+        while (!userInput.equalsIgnoreCase(START) && !userInput.equalsIgnoreCase(QUIT)) {
+            System.out.println("Некорректный ввод. Введите Y или N");
+            userInput = scanner.next();
+        }
+
+        return userInput.equalsIgnoreCase(START);
     }
 
-    private static void getWord() {
+    private static void initWord() {
         List<String> words = new BufferedReader(
                 new InputStreamReader(
                         Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream("dict"))
@@ -46,25 +58,26 @@ public class Main {
         wordToGuess = words.get(new Random().nextInt(words.size())).toLowerCase();
     }
 
+
     private static void playRound() {
-        numOfWrongLetters = 0;
+        wrongLettersCount = 0;
         usedLetters.clear();
-        state = new StringBuilder("*".repeat(wordToGuess.length()));
-        while ((numOfWrongLetters < MAX_MISTAKES) && (state.indexOf("*") != -1)) {
-            printState();
+        mask = new StringBuilder(MASK_SYMBOL.repeat(wordToGuess.length()));
+        while ((wrongLettersCount < MAX_MISTAKES) && (mask.indexOf(MASK_SYMBOL) != -1)) {
+            showState();
             makeMove();
         }
-        printState();
+        showState();
         endGame();
     }
 
 
     private static void makeMove() {
 
-        String input = sc.next();
+        String input = scanner.next();
 
-        if (!isInputOk(input)) {
-            System.out.println("Введите 1 символ кириллицы");
+        if (!isRussianLetter(input)) {
+            System.out.println("Некорректный ввод. Введите 1 символ кириллицы");
             return;
         }
 
@@ -74,19 +87,25 @@ public class Main {
             return;
         }
         usedLetters.add(inputLetter);
-
-        checkLetter(inputLetter);
+        processLetter(inputLetter);
 
     }
 
-
-    private static boolean isInputOk(String input) {
-        return input.length() == 1 && input.matches("^[А-Яа-яЁё]$");
+    private static void showUsedLetters() {
+        System.out.print("Использованные буквы: ");
+        usedLetters.forEach(letter -> System.out.print(letter + " "));
+        System.out.println();
     }
 
-    private static void checkLetter(char letter) {
+
+    private static boolean isRussianLetter(String input) {
+        Matcher matcher = PATTERN.matcher(input);
+        return matcher.matches();
+    }
+
+    private static void processLetter(char letter) {
         if (wordToGuess.indexOf(letter) == -1) {
-            numOfWrongLetters++;
+            wrongLettersCount++;
         } else {
             showLetter(letter);
         }
@@ -96,84 +115,126 @@ public class Main {
     private static void showLetter(char letter) {
         for (int i = 0; i < wordToGuess.length(); i++) {
             if (wordToGuess.charAt(i) == letter) {
-                state.setCharAt(i, letter);
+                mask.setCharAt(i, letter);
             }
         }
     }
 
 
-    private static void printState() {
-        System.out.println(state + " Кол-во ошибок: " + numOfWrongLetters + "/" + MAX_MISTAKES);
-        switch (numOfWrongLetters) {
-            case 0 -> System.out.println(
-                    """
-                            +---+
-                             |   |
-                                 |
-                                 |
-                                 |
-                                 |
-                            =========""" + "\n");
-
-
-            case 1 -> System.out.println("""
-                     +---+
-                     |   |
-                     O   |
-                         |
-                         |
-                         |
-                    =========""");
-
-            case 2 -> System.out.println("""
-                     +---+
-                     |   |
-                     O   |
-                     |   |
-                         |
-                         |
-                    =========""");
-
-            case 3 -> System.out.println("""
-                     +---+
-                     |   |
-                     O   |
-                    /|   |
-                         |
-                         |
-                    =========""");
-            case 4 -> System.out.println("""
-                     +---+
-                     |   |
-                     O   |
-                    /|\\  |
-                         |
-                         |
-                    =========""");
-            case 5 -> System.out.println("""
-                     +---+
-                     |   |
-                     O   |
-                    /|\\  |
-                    /    |
-                         |
-                    =========""");
-            case 6 -> System.out.println("""
-                     +---+
-                     |   |
-                     O   |
-                    /|\\  |
-                    / \\  |
-                         |
-                    =========""" + "\n");
-        }
+    private static void showState() {
+        System.out.println(mask);
+        System.out.println("Кол-во ошибок: " + wrongLettersCount + "/" + MAX_MISTAKES);
+        showUsedLetters();
+        System.out.println(HangmanPictures.values()[wrongLettersCount]);
     }
 
 
     private static void endGame() {
-        if (numOfWrongLetters < MAX_MISTAKES)
-            System.out.println("Победа! Загаданное слово было: " + wordToGuess + "\n");
-        else System.out.println("Поражение! Загаданное слово было: " + wordToGuess + "\n");
+        String resultMessage = wrongLettersCount < MAX_MISTAKES ? "Победа!" : "Поражение!";
+        System.out.println(resultMessage + " Загаданное слово было: " + wordToGuess + "\n");
+    }
+
+    private enum HangmanPictures {
+        NO_MAN {
+            @Override
+            public String toString() {
+                return """
+                        +---+
+                         |   |
+                             |
+                             |
+                             |
+                             |
+                        =========
+                        """;
+            }
+        },
+        HEAD {
+            @Override
+            public String toString() {
+                return """
+                         +---+
+                         |   |
+                         O   |
+                             |
+                             |
+                             |
+                        =========
+                        """;
+            }
+        },
+        BODY {
+            @Override
+            public String toString() {
+                return """
+                         +---+
+                         |   |
+                         O   |
+                         |   |
+                             |
+                             |
+                        =========
+                        """;
+            }
+        },
+        ONE_ARM {
+            @Override
+            public String toString() {
+                return """
+                         +---+
+                         |   |
+                         O   |
+                        /|   |
+                             |
+                             |
+                        =========
+                        """;
+            }
+        },
+        TWO_ARMS {
+            @Override
+            public String toString() {
+                return """
+                         +---+
+                         |   |
+                         O   |
+                        /|\\  |
+                             |
+                             |
+                        =========
+                        """;
+            }
+        },
+        ONE_LEG {
+            @Override
+            public String toString() {
+                return """
+                         +---+
+                         |   |
+                         O   |
+                        /|\\  |
+                        /    |
+                             |
+                        =========
+                        """;
+            }
+        },
+        TWO_LEGS {
+            @Override
+            public String toString() {
+                return """
+                         +---+
+                         |   |
+                         O   |
+                        /|\\  |
+                        / \\  |
+                             |
+                        =========
+                        """;
+            }
+        }
     }
 }
+
+
 
